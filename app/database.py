@@ -170,3 +170,12 @@ def create_tables():
 def add_data(data):
     session.add(data)
     session.commit()
+
+#with engine.connect() as connect:
+#    result = connect.execute(text("select * from qwerty"))
+#    print(result.fetchall())
+
+#playerMenOrm = MenORM(id=3, name="Nizor")
+#with session() as sesion:
+#    sesion.add(playerMenOrm)
+#    sesion.commit()

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Генератор расписания</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/forms.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/navbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/sidebar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/tables.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/auth.css') }}">
+</head>
+
+<body>
+
+    <div class="layout">
+
+        <aside class="sidebar">
+
+            <a class="logout-link" href="{{ request.url_for('logout')}}" title="Выйти из аккаунта">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                Выход
+            </a>
+
+            <div class="logo">
+                Генератор расписания
+            </div>
+            <nav>
+
+                <div class="menu-grid">
+                    <a href="{{ request.url_for('root')}}" class="menu-card">Главная</a>
+                    <a class="menu-card">Преподаватели</a>
+                    <a class="menu-card">Группы</a>
+                    <a class="menu-card">Дисциплины</a>
+                    <a class="menu-card">Предметы преподавателей</a>
+                    <a class="menu-card">Аудитории</a>
+                    <a class="menu-card">Временные слоты</a>
+                    <a class="menu-card">Ограничения</a>
+                    <a class="menu-card">Учебный план</a>
+                    <a class="menu-card">Генерация расписания</a>
+                    <a class="menu-card">Расписание</a>
+                </div>
+                
+            </nav>
+        </aside>
+
+        <main class="content">
+
+            {% block content %}
+            {% endblock %}
+
+        </main>
+
+    </div>
+
+
+</body>
+
+</html>
