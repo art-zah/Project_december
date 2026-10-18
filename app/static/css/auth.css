@@ -54,10 +54,6 @@
     text-align: center;
 }
 
-.auth-messages {
-    margin-top: 20px;
-}
-
 .alert {
     padding-top: 12px;
     border-radius: 8px;
@@ -69,7 +65,7 @@
 .alert-success {
     background: #dcfce7;
     color: #166534;
-}
+} /* возможно после регистрации будет всплывать сообщение об успешной авторизации*/
 
 .alert-danger {
     background: #ffa1a187;
@@ -78,14 +74,4 @@
     width: 100%;
     border: 2px solid rgb(164 4 4 / 21%);
     border-radius: 10px;
-}
-
-.alert-warning {
-    background: #fef3c7;
-    color: #92400e;
-}
-
-.alert-info {
-    background: #dbeafe;
-    color: #1e40af;
 }

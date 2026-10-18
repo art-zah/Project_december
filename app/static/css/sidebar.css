@@ -13,33 +13,6 @@
     color: white;
 }
 
-.sidebar-header {
-    padding: 25px;
-    font-size: 20px;
-    font-weight: bold;
-    border-bottom: 1px solid #374151;
-}
-
-.sidebar-menu {
-    padding: 10px;
-}
-
-.sidebar-menu a {
-    display: block;
-    color: white;
-    padding: 14px 16px;
-    border-radius: 8px;
-    margin-bottom: 6px;
-}
-
-.sidebar-menu a:hover {
-    background: #374151;
-}
-
-.main-content {
-    flex: 1;
-}
-
 .menu-grid {
     display: grid;
     grid-template-columns: repeat(1, 1fr);

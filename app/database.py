@@ -23,7 +23,7 @@ class Users(Base):
     username: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
     password_hash: Mapped[str] = mapped_column(String(225), nullable=False)
 
-class Classroom(Base):
+class Classrooms(Base):
     __tablename__ = "classrooms"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -37,7 +37,7 @@ class Classroom(Base):
         
         ForeignKeyConstraint(["user_id"], ["users.id"], name="fk_user_class"))
 
-class Subject(Base):
+class Subjects(Base):
     __tablename__ = "subjects"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -50,7 +50,7 @@ class Subject(Base):
 
         ForeignKeyConstraint(["user_id"], ["users.id"], name="fk_user_sub"))
 
-class Timeslot(Base):
+class Timeslots(Base):
     __tablename__ = "timeslots"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -64,7 +64,7 @@ class Timeslot(Base):
                       
         ForeignKeyConstraint(["user_id"], ["users.id"], name="fk_user_time"))
 
-class Teacher(Base):
+class Teachers(Base):
     __tablename__ = "teachers"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -77,7 +77,7 @@ class Teacher(Base):
                       
         ForeignKeyConstraint(["user_id"], ["users.id"], name="fk_user_t"))
 
-class Group(Base):
+class Groups(Base):
     __tablename__ = "groups"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -91,7 +91,7 @@ class Group(Base):
 
         ForeignKeyConstraint(["user_id"], ["users.id"], name="fk_user_g"))
 
-class TeacherConstraint(Base):
+class TeacherConstraints(Base):
     __tablename__ = "teacher_constraints"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -107,7 +107,7 @@ class TeacherConstraint(Base):
         ForeignKeyConstraint(["timeslot_id", "user_id"], ["timeslots.id", "timeslots.user_id"], name="fk_timeslot_t_c"),
         ForeignKeyConstraint(["teacher_id", "user_id"], ["teachers.id", "teachers.user_id"], name="fk_teacher_t_c"))
 
-class TeacherSubject(Base):
+class TeacherSubjects(Base):
     __tablename__ = "teacher_subjects"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -122,7 +122,7 @@ class TeacherSubject(Base):
         ForeignKeyConstraint(["teacher_id", "user_id"], ["teachers.id", "teachers.user_id"], name="fk_teacher_t_s"),
         ForeignKeyConstraint(["subject_id", "user_id"], ["subjects.id", "subjects.user_id"], name="fk_subject_t_s"))
 
-class GroupSubjectLimit(Base):
+class GroupSubjectLimits(Base):
     __tablename__ = "group_subject_limits"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -139,7 +139,7 @@ class GroupSubjectLimit(Base):
         ForeignKeyConstraint(["group_id", "user_id"], ["groups.id", "groups.user_id"], name="fk_group_g_s"),
         ForeignKeyConstraint(["subject_id", "user_id"], ["subjects.id", "subjects.user_id"], name="fk_subject_g_s"))
 
-class Schedule(Base):
+class Schedules(Base):
     __tablename__ = "schedules"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
