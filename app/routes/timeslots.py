@@ -182,10 +182,7 @@ async def edit_timeslot_page(request: Request, id: int):
             timeslot = get_timeslot(db_session, id, user_id)
 
             if timeslot is None:
-                timeslots = get_timeslots(db_session, user_id)
-                timeslots_data = [timeslot_to_dict(slot) for slot in timeslots]
-                return templates.TemplateResponse(request=request, name="timeslots/timeslots.html", 
-                    context={"request": request, "timeslots": timeslots_data, "errors": ["Временной слот не найден."]}, status_code=404)
+                return RedirectResponse(url="/timeslots/transition", status_code=303)
 
             timeslot_data = timeslot_to_dict(timeslot)
 
@@ -217,10 +214,7 @@ async def edit_timeslot(request: Request, id: int, day_of_week: str = Form(""), 
             timeslot = get_timeslot(db_session, id, user_id)
 
             if timeslot is None:
-                timeslots = get_timeslots(db_session, user_id)
-                timeslots_data = [timeslot_to_dict(slot) for slot in timeslots]
-                return templates.TemplateResponse(request=request, name="timeslots/timeslots.html", 
-                    context={"request": request, "timeslots": timeslots_data, "errors": ["Временной слот не найден."]}, status_code=404)
+                return RedirectResponse(url="/timeslots/transition", status_code=303)
 
             timeslot.day_of_week = data.day_of_week
             timeslot.lesson_number = data.lesson_number
@@ -252,10 +246,7 @@ async def edit_timeslot(request: Request, id: int, day_of_week: str = Form(""), 
             timeslot = get_timeslot(db_session, id, user_id)
 
             if timeslot is None:
-                timeslots = get_timeslots(db_session, user_id)
-                timeslots_data = [timeslot_to_dict(slot) for slot in timeslots]
-                return templates.TemplateResponse(request=request, name="timeslots/timeslots.html", 
-                    context={"request": request, "timeslots": timeslots_data, "errors": ["Временной слот не найден."]}, status_code=404)
+                return RedirectResponse(url="/timeslots/transition", status_code=303)
 
             timeslot_data = {"id": timeslot.id, "day_of_week": day_of_week, "lesson_number": lesson_number, "start_time": start_time, 
                 "end_time": end_time}
@@ -285,10 +276,7 @@ async def delete_timeslot(request: Request, id: int):
             timeslot = get_timeslot(db_session, id, user_id)
 
             if timeslot is None:
-                timeslots = get_timeslots(db_session, user_id)
-                timeslots_data = [timeslot_to_dict(slot) for slot in timeslots]
-                return templates.TemplateResponse(request=request, name="timeslots/timeslots.html", 
-                    context={"request": request, "timeslots": timeslots_data, "errors": ["Временной слот не найден."]}, status_code=404)
+                return RedirectResponse(url="/timeslots/transition", status_code=303)
 
             schedule_exists = db_session.execute(select(Schedules.id)
                 .where(Schedules.timeslot_id == id, Schedules.user_id == user_id).limit(1)).first()

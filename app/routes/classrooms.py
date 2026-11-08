@@ -12,7 +12,7 @@ from app.pedant import Classroom
 
 router = APIRouter(prefix="/classrooms")
 
-logging.basicConfig(filename="app.log", filemode="a", level=logging.ERROR, format="%(asctime)s - %(levelname)s - %(message)s",)
+logging.basicConfig(filename="app.log", filemode="a", level=logging.ERROR, format="%(asctime)s - %(levelname)s - %(message)s")
 
 
 def validate_classroom(room_number: str, capacity: str, room_type: str):
@@ -27,8 +27,7 @@ def get_user_id(request: Request):
 
 def get_classroom(db_session, classroom_id: int, user_id: int):
     """Возвращает аудиторию только текущего пользователя"""
-    return db_session.execute(select(Classrooms).where(Classrooms.id == classroom_id, 
-        Classrooms.user_id == user_id,)).scalars().first()
+    return db_session.execute(select(Classrooms).where(Classrooms.id == classroom_id, Classrooms.user_id == user_id)).scalars().first()
 
 
 def classroom_form_response(request: Request, template_name: str, errors: list, room_number: str = "",
@@ -42,11 +41,26 @@ def classroom_form_response(request: Request, template_name: str, errors: list, 
 
     return templates.TemplateResponse(request=request, name=template_name, context=context, status_code=status_code)
 
+
+def classroom_validation_errors(e: ValidationError):
+    """Преобразует ошибки Pydantic в понятные сообщения."""
+    errors = []
+    for error in e.errors():
+        field = error["loc"][0]
+        if field == "room_number":
+            errors.append("Номер аудитории обязателен и должен содержать не более 20 символов.")
+        elif field == "capacity":
+            errors.append("Вместимость должна быть положительным целым числом.")
+        elif field == "room_type":
+            errors.append("Тип аудитории обязателен и должен содержать не более 50 символов.")
+    return errors
+
+
 # ============================================================
-# READ: список преподавателей
+# READ: список аудиторий
 # ============================================================
 
-@router.get("/transition", tags=["classrooms"])
+@router.get("/transition", name="transition_to_classrooms", tags=["classrooms"])
 async def transition_to_classrooms(request: Request):
     user_id = get_user_id(request)
 
@@ -89,8 +103,6 @@ async def create_classroom(request: Request, room_number: str = Form(""), capaci
     if user_id is None:
         return RedirectResponse(url="/auth/login", status_code=303)
 
-    errors = []
-
     try:
         int(capacity)
         data = validate_classroom(room_number, capacity, room_type)
@@ -105,21 +117,16 @@ async def create_classroom(request: Request, room_number: str = Form(""), capaci
         return RedirectResponse(url="/classrooms/create", status_code=303)
 
     except ValidationError as e:
-        for error in e.errors():
-            field = error["loc"][0]
-
-            if field == "room_number":
-                errors.append("Номер аудитории обязателен и должен содержать не более 20 символов.")
-            elif field == "capacity":
-                errors.append("Вместимость должна быть положительным целым числом.")
-            elif field == "room_type":
-                errors.append("Тип аудитории обязателен и должен содержать не более 50 символов.")
+        errors = classroom_validation_errors(e)
         status_code = 400
 
     except IntegrityError:
-        errors.append("Аудитория с таким номером уже существует или нарушены ограничения")
+        errors = ["Аудитория с таким номером уже существует."]
         status_code = 400
-
+    except SQLAlchemyError:
+        logging.exception("Ошибка добавления аудитории")
+        errors = ["Не удалось сохранить аудиторию. Попробуйте позже."]
+        status_code = 500
     except Exception as e:
         logging.error(f"{e}, file: classrooms.py/create")
         print("Ошибка в classrooms.py:", e)
@@ -128,6 +135,7 @@ async def create_classroom(request: Request, room_number: str = Form(""), capaci
 
     return classroom_form_response(request=request, template_name="classrooms/create_classroom.html", errors=errors,
         room_number=room_number, capacity=capacity, room_type=room_type, status_code=status_code)
+
 
 # ============================================================
 # UPDATE: форма редактирования
@@ -145,10 +153,8 @@ async def edit_classroom_page(request: Request, id: int):
             classroom = get_classroom(db_session, id, user_id)
 
             if classroom is None:
-                return templates.TemplateResponse(request=request, name="classrooms/classrooms.html", 
-                    context={"request": request, "errors": ["Аудитория не найдена"]}, status_code=404)
+                return RedirectResponse(url="/classrooms/transition", status_code=303)
 
-            # Сохраняем значения для отображения формы.
             classroom_data = {"id": classroom.id, "room_number": classroom.room_number, "capacity": classroom.capacity, "room_type": classroom.room_type}
 
         return templates.TemplateResponse(request=request, name="classrooms/edit_classroom.html",
@@ -172,19 +178,15 @@ async def edit_classroom(request: Request, id: int, room_number: str = Form(""),
     if user_id is None:
         return RedirectResponse(url="/auth/login", status_code=303)
 
-    errors = []
-
     try:
         int(capacity)
         data = validate_classroom(room_number, capacity, room_type)
 
         with session() as db_session:
             classroom = get_classroom(db_session, id, user_id)
-
             if classroom is None:
-                return templates.TemplateResponse(request=request, name="classrooms/classrooms.html", 
-                    context={"request": request, "errors": ["Аудитория не найдена"]}, status_code=404)
-                
+                return RedirectResponse(url="/classrooms/transition", status_code=303)
+
             classroom.room_number = data.room_number
             classroom.capacity = data.capacity
             classroom.room_type = data.room_type
@@ -196,21 +198,15 @@ async def edit_classroom(request: Request, id: int, room_number: str = Form(""),
         return RedirectResponse(url="/classrooms/transition", status_code=303)
 
     except ValidationError as e:
-        for error in e.errors():
-            field = error["loc"][0]
-
-            if field == "room_number":
-                errors.append("Номер аудитории обязателен и должен содержать не более 20 символов.")
-            elif field == "capacity":
-                errors.append("Вместимость должна быть положительным целым числом.")
-            elif field == "room_type":
-                errors.append("Тип аудитории обязателен и должен содержать не более 50 символов.")
-            status_code = 400
-
-    except IntegrityError:
-        errors.append("Аудитория с таким номером уже существует или нарушены ограничения")
+        errors = classroom_validation_errors(e)
         status_code = 400
-
+    except IntegrityError:
+        errors = ["Аудитория с таким номером уже существует."]
+        status_code = 400
+    except SQLAlchemyError:
+        logging.exception("Ошибка редактирования аудитории")
+        errors = ["Не удалось обновить данные аудитории. Попробуйте позже."]
+        status_code = 500
     except Exception as e:
         logging.error(f"{e}, file: classrooms.py/update/edit")
         print("Ошибка в classrooms.py:", e)
@@ -223,18 +219,7 @@ async def edit_classroom(request: Request, id: int, room_number: str = Form(""),
             classroom = get_classroom(db_session, id, user_id)
 
             if classroom is None:
-                try:
-                    with session() as db_session:
-                        classrooms = db_session.execute(select(Classrooms).where(Classrooms.user_id == user_id).order_by(Classrooms.id)).scalars().all()
-            
-                    return templates.TemplateResponse(request=request, name="classrooms/classrooms.html",
-                        context={"request": request, "classrooms": classrooms, "errors": ["Аудитория не найдена"]}, status_code=404)
-            
-                except SQLAlchemyError:
-                    logging.exception("Ошибка получения списка аудиторий")
-                    return templates.TemplateResponse(request=request, name="classrooms/classrooms.html",
-                        context={"request": request, "classrooms": [], "errors": ["Не удалось загрузить список аудиторий."]}, status_code=500)
-
+                return RedirectResponse(url="/classrooms/transition", status_code=303)
             classroom_data = {"id": classroom.id, "room_number": room_number, "capacity": capacity, "room_type": room_type}
 
     except Exception as e:
@@ -245,6 +230,7 @@ async def edit_classroom(request: Request, id: int, room_number: str = Form(""),
 
     return classroom_form_response(request=request, template_name="classrooms/edit_classroom.html", errors=errors,
         room_number=room_number, capacity=capacity, room_type=room_type, classroom=classroom_data, status_code=status_code)
+
 
 # ============================================================
 # DELETE: удаление аудитории
@@ -262,17 +248,7 @@ async def delete_classroom(request: Request, id: int):
             classroom = get_classroom(db_session, id, user_id)
 
             if classroom is None:
-                try:
-                    with session() as db_session:
-                        classrooms = db_session.execute(select(Classrooms).where(Classrooms.user_id == user_id).order_by(Classrooms.id)).scalars().all()
-            
-                    return templates.TemplateResponse(request=request, name="classrooms/classrooms.html",
-                        context={"request": request, "classrooms": classrooms, "errors": ["Аудитория не найдена"]}, status_code=404)
-            
-                except SQLAlchemyError:
-                    logging.exception("Ошибка получения списка аудиторий")
-                    return templates.TemplateResponse(request=request, name="classrooms/classrooms.html",
-                        context={"request": request, "classrooms": [], "errors": ["Не удалось загрузить список аудиторий."]}, status_code=500)
+                return RedirectResponse(url="/classrooms/transition", status_code=303)
 
             # Не удаляем аудиторию, если она уже используется в существующем расписании.
             schedule_exists = db_session.execute(select(Schedules.id).where(Schedules.classroom_id == id, Schedules.user_id == user_id).limit(1)).first()
@@ -282,6 +258,7 @@ async def delete_classroom(request: Request, id: int):
                     context={"request": request, 
                         "errors": ["Нельзя удалить аудиторию: она используется в расписании. Сначала измените или удалите соответствующие записи расписания."]},
                     status_code=409)
+
             db_session.delete(classroom)
             db_session.commit()
 

@@ -206,9 +206,7 @@ async def edit_constraint_page(request: Request, id: int):
         with session() as db_session:
             constraint = get_constraint(db_session, id, user_id)
             if constraint is None:
-                constraints = get_constraints(db_session, user_id)
-                return templates.TemplateResponse(request=request, name="constraints/constraints.html", 
-                    context={"request": request, "constraints": constraints, "errors": ["Ограничение не найдено."]}, status_code=404)
+                return RedirectResponse(url="/constraints/transition", status_code=303)
 
             teachers = get_teachers(db_session, user_id)
             timeslots = get_timeslots(db_session, user_id)
@@ -241,9 +239,7 @@ async def edit_constraint(request: Request, id: int, teacher_id: str = Form(""),
         with session() as db_session:
             constraint = get_constraint(db_session, id, user_id)
             if constraint is None:
-                constraints = get_constraints(db_session, user_id)
-                return templates.TemplateResponse(request=request, name="constraints/constraints.html", 
-                    context={"request": request, "constraints": constraints, "errors": ["Ограничение не найдено."]}, status_code=404)
+                return RedirectResponse(url="/constraints/transition", status_code=303)
 
             if not check_constraint_relations(db_session, data.teacher_id, data.timeslot_id, user_id):
                 teachers = get_teachers(db_session, user_id)
@@ -282,9 +278,7 @@ async def edit_constraint(request: Request, id: int, teacher_id: str = Form(""),
         with session() as db_session:
             constraint = get_constraint(db_session, id, user_id)
             if constraint is None:
-                constraints = get_constraints(db_session, user_id)
-                return templates.TemplateResponse(request=request, name="constraints/constraints.html", 
-                    context={"request": request, "constraints": constraints, "errors": ["Ограничение не найдено."]}, status_code=404)
+                return RedirectResponse(url="/constraints/transition", status_code=303)
 
             teachers = get_teachers(db_session, user_id)
             timeslots = get_timeslots(db_session, user_id)
@@ -315,9 +309,7 @@ async def delete_constraint(request: Request, id: int):
         with session() as db_session:
             constraint = get_constraint(db_session, id, user_id)
             if constraint is None:
-                constraints = get_constraints(db_session, user_id)
-                return templates.TemplateResponse(request=request, name="constraints/constraints.html", 
-                    context={"request": request, "constraints": constraints, "errors": ["Ограничение не найдено."]}, status_code=404)
+                return RedirectResponse(url="/constraints/transition", status_code=303)
 
             db_session.delete(constraint)
             db_session.commit()

@@ -163,11 +163,7 @@ async def edit_teacher_page(request: Request, id: int):
             teacher = get_teacher(db_session, id, user_id)
 
             if teacher is None:
-                teachers = get_teachers(db_session, user_id)
-                teachers_data = [{"id": item.id, "full_name": item.name, "phone": item.phone, 
-                    "max_lessons_per_day": item.max_lessons_per_day} for item in teachers]
-                return templates.TemplateResponse(request=request, name="teachers/teachers.html", 
-                    context={"request": request, "teachers": teachers_data, "errors": ["Преподаватель не найден."]}, status_code=404)
+                return RedirectResponse(url="/teachers/transition", status_code=303)
 
             teacher_data = {"id": teacher.id, "full_name": teacher.name, "phone": teacher.phone or "", 
                 "max_lessons_per_day": teacher.max_lessons_per_day}
@@ -199,11 +195,7 @@ async def edit_teacher(request: Request, id: int, full_name: str = Form(""), pho
             teacher = get_teacher(db_session, id, user_id)
 
             if teacher is None:
-                teachers = get_teachers(db_session, user_id)
-                teachers_data = [{"id": item.id, "full_name": item.name, "phone": item.phone, 
-                    "max_lessons_per_day": item.max_lessons_per_day} for item in teachers]
-                return templates.TemplateResponse(request=request, name="teachers/teachers.html", 
-                    context={"request": request, "teachers": teachers_data, "errors": ["Преподаватель не найден."]}, status_code=404)
+                return RedirectResponse(url="/teachers/transition", status_code=303)
 
             teacher.name = data.full_name
             teacher.phone = data.phone
@@ -235,11 +227,7 @@ async def edit_teacher(request: Request, id: int, full_name: str = Form(""), pho
             teacher = get_teacher(db_session, id, user_id)
 
             if teacher is None:
-                teachers = get_teachers(db_session, user_id)
-                teachers_data = [{"id": item.id, "full_name": item.name, "phone": item.phone, 
-                    "max_lessons_per_day": item.max_lessons_per_day} for item in teachers]
-                return templates.TemplateResponse(request=request, name="teachers/teachers.html", 
-                    context={"request": request, "teachers": teachers_data, "errors": ["Преподаватель не найден."]}, status_code=404)
+                return RedirectResponse(url="/teachers/transition", status_code=303)
 
             teacher_data = {"id": teacher.id, "full_name": full_name, "phone": phone, "max_lessons_per_day": max_lessons_per_day}
 
@@ -268,11 +256,7 @@ async def delete_teacher(request: Request, id: int):
             teacher = get_teacher(db_session, id, user_id)
 
             if teacher is None:
-                teachers = get_teachers(db_session, user_id)
-                teachers_data = [{"id": item.id, "full_name": item.name, "phone": item.phone, 
-                    "max_lessons_per_day": item.max_lessons_per_day} for item in teachers]
-                return templates.TemplateResponse(request=request, name="teachers/teachers.html", 
-                    context={"request": request, "teachers": teachers_data, "errors": ["Преподаватель не найден."]}, status_code=404)
+                return RedirectResponse(url="/teachers/transition", status_code=303)
 
             schedule_exists = db_session.execute(select(Schedules.id).where(Schedules.teacher_id == id, Schedules.user_id == user_id).limit(1)).first()
             subject_exists = db_session.execute(select(TeacherSubjects.id)
