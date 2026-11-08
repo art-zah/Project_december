@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+
+    <div class="page-header">
+        <h1 class="page-title">Генерация расписания</h1>
+        <p>Запуск генетического алгоритма формирования расписания</p>
+    </div>
+
+    {% if errors %}
+        <div class="alert">
+            {% for error in errors %}
+                <div class="alert-danger">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="generator-container">
+
+        <div class="generator-card">
+            <h2>Создание расписания</h2>
+            <p>Генератор использует:</p>
+
+            <ul>
+                <li>Преподавателей</li>
+                <li>Аудитории</li>
+                <li>Дисциплины</li>
+                <li>Предметы преподавателей</li>
+                <li>Временные слоты</li>
+                <li>Ограничения преподавателей</li>
+                <li>Группы</li>
+                <li>Учебный план</li>
+            </ul>
+
+            <form method="POST" action="{{ request.url_for('generator.generate') }}">
+                <button type="submit" class="btn-success">Сгенерировать расписание</button>
+            </form>
+        </div>
+
+        <div class="generator-card">
+            <h2>Управление расписанием</h2>
+            <p>Полностью удалить текущее расписание.</p>
+
+            <form method="POST" action="{{ request.url_for('generator.clear') }}">
+                <button type="submit" class="btn-danger" onclick="return confirm('Удалить расписание?')">Очистить расписание</button>
+            </form>
+        </div>
+
+        <div class="generator-card">
+            <h2>Просмотр результата</h2>
+            <p>Перейти к сформированному расписанию.</p>
+
+            <a href="{{ request.url_for('transition_to_schedules') }}" class="btn-primary">Открыть расписание</a>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

@@ -11,6 +11,10 @@
     <link rel="stylesheet" href="{{ url_for('static', path='css/auth.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', path='css/sidebar.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', path='css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/forms.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/navbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/tables.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/schedule.css') }}">
 </head>
 
 <body>
@@ -36,18 +40,26 @@
 
                     <div class="menu-grid">
                         <a href="{{ request.url_for('transition_to_index')}}" class="menu-card">Главная</a>
-                        <a class="menu-card">Преподаватели</a>
-                        <a class="menu-card">Группы</a>
-                        <a class="menu-card">Дисциплины</a>
-                        <a class="menu-card">Предметы преподавателей</a>
-                        <a class="menu-card">Аудитории</a>
-                        <a class="menu-card">Временные слоты</a>
-                        <a class="menu-card">Ограничения</a>
-                        <a class="menu-card">Учебный план</a>
-                        <a class="menu-card">Генерация расписания</a>
-                        <a class="menu-card">Расписание</a>
+                        <a href="{{ request.url_for('transition_to_teachers') }}" class="menu-card">Преподаватели</a>
+                        <a href="{{ request.url_for('transition_to_classrooms')}}" class="menu-card">Аудитории</a>
+                        <a href="{{ request.url_for('transition_to_subjects') }}" class="menu-card">Дисциплины</a>
+                        <a href="{{ request.url_for('transition_to_teacher_subjects') }}" class="menu-card">Предметы преподавателей</a>
+                        <a href="{{ request.url_for('transition_to_timeslots') }}" class="menu-card">Временные слоты</a>
+                        <a href="{{ request.url_for('transition_to_constraints') }}" class="menu-card">Ограничения</a>
+                        <a href="{{ request.url_for('transition_to_groups') }}" class="menu-card">Группы</a>
+                        <a href="{{ request.url_for('transition_to_study_plan') }}" class="menu-card">Учебный план</a>
+                        <a href="{{ request.url_for('transition_to_generator') }}" class="menu-card">Генерация расписания</a>
+                        <a href="{{ request.url_for('transition_to_schedules') }}" class="menu-card">Расписание</a>
                     </div>
                     
+                    {% set flash_success = request.session.pop('flash_success', None) %}
+                    {% if flash_success %}
+                        <div class="notification notification-success" id="notification">
+                            <span class="notification-icon">✓</span>
+                            <span class="notification-message">{{ flash_success }}</span>
+                            <button type="button" class="notification-close" onclick="closeNotification()">×</button>
+                        </div>
+                    {% endif %}
                 </nav>
             </aside>
         {% endif %}
@@ -61,6 +73,10 @@
 
     </div>
 
+    <script src="{{ url_for('static', path='js/notifications.js') }}"></script>
+    <script src="{{ url_for('static', path='js/search.js') }}"></script>
+    <script src="{{ url_for('static', path='js/sort.js') }}"></script>
+    <script src="{{ url_for('static', path='js/validation.js') }}"></script>
 
 </body>
 

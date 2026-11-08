@@ -5,7 +5,7 @@
     <div class="auth-card">
         <h1 class="auth-title">Вход в систему</h1>
 
-        <form method="POST" class="auth-form">
+        <form method="POST" action="/auth/login" class="auth-form">
             <div class="form-group">
                 <label>Логин</label>
                 <input type="text" name="username" value="{{ username or '' }}" minlength="1" maxlength="50" required>

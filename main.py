@@ -4,9 +4,8 @@ from fastapi.responses import RedirectResponse
 import uvicorn
 from starlette.middleware.sessions import SessionMiddleware
 from app.database import create_tables
-from app.routes.auth import router as auth_router 
+from app.routes import auth, index, classrooms, teachers, constraints, timeslots, groups, subjects, teacher_subjects, study_plan, schedules, generator_routes
 from app.templates_config import templates
-from app.routes.index import router as index_router
 from dotenv import load_dotenv
 import os
 
@@ -23,14 +22,23 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 app.add_middleware(SessionMiddleware, secret_key=SECRET_KEY)
 
-app.include_router(auth_router)
-app.include_router(index_router)
-
+app.include_router(auth.router)
+app.include_router(index.router)
+app.include_router(classrooms.router)
+app.include_router(teachers.router)
+app.include_router(constraints.router)
+app.include_router(timeslots.router)
+app.include_router(groups.router)
+app.include_router(subjects.router)
+app.include_router(teacher_subjects.router)
+app.include_router(study_plan.router)
+app.include_router(schedules.router)
+app.include_router(generator_routes.router)
 
 @app.get("/", tags=["root"])
 async def root(request: Request):
     if request.session.get("user_id"):
-        return RedirectResponse(url="/index", status_code=status.HTTP_303_SEE_OTHER)
+        return RedirectResponse(url="/index", status_code=303)
     return RedirectResponse(url="/auth/login", status_code=303)
 
 

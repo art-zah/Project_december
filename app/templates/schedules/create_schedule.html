@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <div class="flex">
+        <a class="back-link" href="{{ request.url_for('transition_to_schedules') }}" title="Вернуться назад">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+            Назад
+        </a>
+
+        <h1 class="page-title">Новое занятие</h1>
+    </div>
+
+    <div class="form-card">
+        <form method="POST" action="{{ request.url_for('schedules.create') }}?group_id={{ group.id }}">
+            <div class="form-group">
+                <label>Группа</label>
+                <input type="text" value="{{ group.name }}" disabled>
+            </div>
+
+            <div class="form-group">
+                <label>Предмет</label>
+                <select name="subject_id" required>
+                    {% for subject in subjects %}
+                    <option value="{{ subject.id }}" {% if subject_id and subject_id|string == subject.id|string %} selected {% endif %}>
+                        {{ subject.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Преподаватель</label>
+                <select name="teacher_id" required>
+                    {% for teacher in teachers %}
+                    <option value="{{ teacher.id }}" {% if teacher_id and teacher_id|string == teacher.id|string %} selected {% endif %}>
+                        {{ teacher.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Аудитория</label>
+                <select name="classroom_id" required>
+                    {% for classroom in classrooms %}
+                    <option value="{{ classroom.id }}" {% if classroom_id and classroom_id|string == classroom.id|string %} selected {% endif %}>
+                        {{ classroom.room_number }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Временной слот</label>
+                <select name="timeslot_id" required>
+                    {% for slot in timeslots %}
+                    <option value="{{ slot.id }}" {% if timeslot_id and timeslot_id|string == slot.id|string %} selected {% endif %}>
+                        {{ slot.day_of_week }} — {{ slot.lesson_number }} пара</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <button type="submit" class="btn-success">Сохранить</button>
+        </form>
+
+        {% if errors %}
+            <div class="alert">
+                {% for error in errors %}
+                    <div class="alert-danger">
+                        {{ error }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+    </div>
+</div>
+{% endblock %}

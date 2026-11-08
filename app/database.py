@@ -61,6 +61,7 @@ class Timeslots(Base):
     end_time: Mapped[object] = mapped_column(Time, nullable=False)
 
     __table_args__ = (UniqueConstraint("id", "user_id", name="id_user_id_time"),
+        UniqueConstraint("day_of_week", "lesson_number", "user_id",  name="day_of_week_lesson_number_user_id_time"),
                       
         ForeignKeyConstraint(["user_id"], ["users.id"], name="fk_user_time"))
 
@@ -74,6 +75,7 @@ class Teachers(Base):
     max_lessons_per_day: Mapped[int] = mapped_column(Integer, nullable=False)
 
     __table_args__ = (UniqueConstraint("id", "user_id", name="id_user_id_t"),
+        UniqueConstraint("phone", "user_id", name="phone_user_id_t"),
                       
         ForeignKeyConstraint(["user_id"], ["users.id"], name="fk_user_t"))
 
@@ -129,7 +131,7 @@ class GroupSubjectLimits(Base):
     user_id: Mapped[int] = mapped_column(Integer, nullable=False)
     group_id: Mapped[int] = mapped_column(Integer, nullable=False)
     subject_id: Mapped[int] = mapped_column(Integer, nullable=False)
-    max_lessons_per_week: Mapped[int] = mapped_column(Integer, nullable=False)
+    lessons_per_week: Mapped[int] = mapped_column(Integer, nullable=False)
 
     __table_args__ = (
         UniqueConstraint("id", "user_id", name="id_user_id_g_s"),
@@ -171,11 +173,13 @@ def add_data(data):
     session.add(data)
     session.commit()
 
-#with engine.connect() as connect:
-#    result = connect.execute(text("select * from qwerty"))
-#    print(result.fetchall())
-
-#playerMenOrm = MenORM(id=3, name="Nizor")
-#with session() as sesion:
-#    sesion.add(playerMenOrm)
-#    sesion.commit()
+User = Users
+Classroom = Classrooms
+Subject = Subjects
+Timeslot = Timeslots
+Teacher = Teachers
+Group = Groups
+TeacherConstraint = TeacherConstraints
+TeacherSubject = TeacherSubjects
+GroupSubjectLimit = GroupSubjectLimits
+Schedule = Schedules

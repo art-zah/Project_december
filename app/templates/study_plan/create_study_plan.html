@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <div class="flex">
+        <a class="back-link" href="{{ request.url_for('transition_to_study_plan') }}" title="Вернуться назад">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+            Назад
+        </a>
+
+        <h1 class="page-title">Новый учебный план</h1>
+    </div>
+
+    <div class="form-card">
+        <form method="POST">
+            
+            <div class="form-group">
+                <label>Группа</label>
+                <select name="group_id" required>
+                    {% for group in groups %}
+                    <option value="{{ group.id }}" {% if group_id and group_id|string == group.id|string %} selected {% endif %}>{{ group.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Предмет</label>
+                <select name="subject_id" required>
+                    {% for subject in subjects %}
+                    <option value="{{ subject.id }}" {% if subject_id and subject_id|string == subject.id|string %} selected {% endif %}>{{ subject.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Пар в неделю</label>
+                <input type="number" name="lessons_per_week" value="{{ lessons_per_week or '' }}" min="1" required>
+            </div>
+
+            <button type="submit" class="btn-success">Сохранить</button>
+
+        </form>
+
+        {% if errors %}
+            <div class="alert">
+                {% for error in errors %}
+                    <div class="alert-danger">
+                        {{ error }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

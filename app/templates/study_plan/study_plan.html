@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+
+    <h1 class="page-title">Учебные планы</h1>
+
+    <a href="{{ request.url_for('study_plan.create') }}" class="btn-primary">Добавить запись</a>
+
+    <input type="text" id="searchInput" placeholder="Поиск...">
+
+    {% if errors %}
+        <div class="alert">
+            {% for error in errors %}
+                <div class="alert-danger">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>
+                        Группа
+                        <select class="sort-control" data-column="1" data-type="text">
+                            <option value=""> </option>
+                            <option value="asc">А-Я</option>
+                            <option value="desc">Я-А</option>
+                        </select>
+                    </th>
+                    <th>
+                        Предмет
+                        <select class="sort-control" data-column="2" data-type="text">
+                            <option value=""> </option>
+                            <option value="asc">А-Я</option>
+                            <option value="desc">Я-А</option>
+                        </select>
+                    </th>
+                    <th>
+                        Пар в неделю
+                        <select class="sort-control" data-column="3" data-type="number">
+                            <option value=""> </option>
+                            <option value="asc">↑</option>
+                            <option value="desc">↓</option>
+                        </select>
+                    </th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for plan in plans %}
+                <tr>
+                    <td>{{ plan.id }}</td>
+                    <td>{{ plan.group.name }}</td>
+                    <td>{{ plan.subject.name }}</td>
+                    <td>{{ plan.lessons_per_week }}</td>
+                    <td>
+                        <form method="POST" action="{{ request.url_for('study_plan.delete', id=plan.id) }}" style="display:inline;">
+                            <button type="submit" class="btn-danger" onclick="return confirm('Удалить предмет для группы?')">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                    <line x1="10" y1="11" x2="10" y2="17"></line>
+                                    <line x1="14" y1="11" x2="14" y2="17"></line>
+                                </svg>
+                                Удалить
+                            </button>
+                        </form>
+                        |
+                        <a href="{{ request.url_for('study_plan.edit', id=plan.id) }}" class="btn-primary">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                            </svg>
+                            Изменить
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div id="noResults" class="card" style="display:none;">Ничего не найдено</div>
+
+    </div>
+</div>
+{% endblock %}

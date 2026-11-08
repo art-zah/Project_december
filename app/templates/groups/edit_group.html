@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <div class="flex">
+        <a class="back-link" href="{{ request.url_for('transition_to_groups') }}" title="Вернуться назад">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+            Назад
+        </a>
+
+        <h1 class="page-title">Редактирование группы</h1>
+    </div>
+
+    <div class="form-card">
+        <form method="POST">
+            <div class="form-group">
+                <label>Название группы</label>
+                <input type="text" name="name" value="{{ group.name }}" minlength="1" maxlength="100" required>
+            </div>
+
+            <div class="form-group">
+                <label>Курс</label>
+                <input type="number" name="course" value="{{ group.course }}" min="1" required>
+            </div>
+
+            <div class="form-group">
+                <label>Специальность</label>
+                <input type="text" name="speciality" value="{{ group.speciality }}" minlength="1" maxlength="100" required>
+            </div>
+
+            <button type="submit" class="btn-success">Сохранить</button>
+        </form>
+
+        {% if errors %}
+            <div class="alert">
+                {% for error in errors %}
+                    <div class="alert-danger">
+                        {{ error }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

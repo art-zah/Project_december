@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+
+    <h1 class="page-title">Расписание занятий</h1>
+
+    <a href="{{ request.url_for('transition_to_generator') }}" class="btn-primary">Генератор расписания</a>
+
+    {% if errors %}
+        <div class="alert">
+            {% for error in errors %}
+                <div class="alert-danger">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if grouped_schedules %}
+        <input type="text" id="searchInput" placeholder="Поиск...">
+        <div id="noResults" class="card" style="display:none; text-align: center; font-weight: bold; margin: 20px;">Ничего не найдено</div>
+
+        {% for group_name, lessons in grouped_schedules.items() %}
+        <div class="card" style="margin-bottom: 25px;">
+            <div class="flex" style="justify-content: space-between; margin-bottom: 15px;">
+                <h2>{{ group_name }}</h2>
+                <a class="btn-success" href="{{ request.url_for('schedules.create') }}?group_id={{ lessons[0].group.id }}">Добавить занятие</a>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>
+                                День
+                                <select class="sort-control" data-column="0" data-type="weekday">
+                                    <option value=""> </option>
+                                    <option value="asc">Пн → Вс</option>
+                                    <option value="desc">Вс → Пн</option>
+                                </select>
+                            </th>
+                            <th>
+                                Пара
+                                <select class="sort-control" data-column="1" data-type="number">
+                                    <option value=""> </option>
+                                    <option value="asc">↑</option>
+                                    <option value="desc">↓</option>
+                                </select>
+                            </th>
+                            <th>
+                                Предмет
+                                <select class="sort-control" data-column="2" data-type="text">
+                                    <option value=""> </option>
+                                    <option value="asc">А-Я</option>
+                                    <option value="desc">Я-А</option>
+                                </select>
+                            </th>
+                            <th>
+                                Преподаватель
+                                <select class="sort-control" data-column="3" data-type="text">
+                                    <option value=""> </option>
+                                    <option value="asc">А-Я</option>
+                                    <option value="desc">Я-А</option>
+                                </select>
+                            </th>
+                            <th>
+                                Аудитория
+                                <select class="sort-control" data-column="4" data-type="text">
+                                    <option value=""> </option>
+                                    <option value="asc">А-Я</option>
+                                    <option value="desc">Я-А</option>
+                                </select>
+                            </th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for lesson in lessons %}
+                        <tr {% if conflicts and lesson.id in conflicts %}class="conflict-row"{% endif %}>
+                            <td>{{ lesson.timeslot.day_of_week }}</td>
+                            <td>{{ lesson.timeslot.lesson_number }}</td>
+                            <td>{{ lesson.subject.name }}</td>
+                            <td>{{ lesson.teacher.full_name }}</td>
+                            <td>{{ lesson.classroom.room_number }}</td>
+                            <td>
+                                <form method="POST" action="{{ request.url_for('schedules.delete', id=lesson.id) }}" style="display:inline;">
+                                    <button type="submit" class="btn-danger" onclick="return confirm('Удалить занятие?')">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="3 6 5 6 21 6"></polyline>
+                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                            <line x1="10" y1="11" x2="10" y2="17"></line>
+                                            <line x1="14" y1="11" x2="14" y2="17"></line>
+                                        </svg>
+                                        Удалить
+                                    </button>
+                                </form>
+                                |
+                                <a href="{{ request.url_for('schedules.edit', id=lesson.id) }}" class="btn-primary">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                    </svg>
+                                    Изменить
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="form-card" style="margin-top: 20px;">
+            <h3 style="margin-bottom: 10px;">Расписание отсутствует</h3>
+            <p style="margin-bottom: 15px;">Сгенерируйте расписание через модуль генерации.</p>
+            <a href="{{ request.url_for('transition_to_generator') }}" class="btn-success">Перейти к генерации</a>
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}

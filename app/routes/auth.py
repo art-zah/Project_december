@@ -1,13 +1,15 @@
+import logging
 from fastapi import APIRouter, status, Request, Form, HTTPException
 from fastapi.responses import RedirectResponse
+from pydantic import ValidationError
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy import select
+from pwdlib import PasswordHash
+
 from app.database import session, Users
 from app.pedant import User
 from app.templates_config import templates
-from pydantic import ValidationError
-from pwdlib import PasswordHash
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy import select
-import logging
+
 
 router = APIRouter(prefix="/auth") # подключаем роутер
 
@@ -20,7 +22,7 @@ async def transition_to_register(request: Request):
     return templates.TemplateResponse(request=request, name="auth/register.html", context={"request": request})
 
 @router.post("/register", tags=["register"], status_code=status.HTTP_201_CREATED)
-async def user_register(request: Request, username: str = Form(...), password: str = Form(...)):
+async def user_register(request: Request, username: str = Form(""), password: str = Form("")):
     errors = []
     try:
         User(username=username, password=password)
@@ -31,6 +33,7 @@ async def user_register(request: Request, username: str = Form(...), password: s
             db_sesion.commit()
             user_id = userORM.id
         request.session["flash_success"] = "Регистрация прошла успешно!"
+        request.session["username"] = username
         request.session["user_id"] = user_id
         return RedirectResponse(url="/index", status_code=303)
 
@@ -63,7 +66,7 @@ async def transition_to_login(request: Request):
     return templates.TemplateResponse(request=request, name="auth/login.html", context={"request": request})
 
 @router.post("/login", tags=["auth"])
-async def user_login(request: Request, username: str = Form(...), password: str = Form(...)):
+async def user_login(request: Request, username: str = Form(""), password: str = Form("")):
     errors = []
     try:
         User(username=username, password=password)
@@ -102,7 +105,5 @@ async def user_login(request: Request, username: str = Form(...), password: str 
 
 @router.get("/logout", tags=["logout"])
 async def logout(request: Request):
-
     request.session.clear()
-
     return RedirectResponse(url="/auth/login", status_code=303)
